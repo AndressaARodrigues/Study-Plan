@@ -1,18 +1,33 @@
-import { useSate } from 'react';
+import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
 import Logo from '../../assets/logo-img.png';
 import '../login/login.css';
 
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import firebase from '../../config/firebase'; 
+
+
 function Login() {
-    const [email, setEmail] = useSate();
-    const [senha, setSenha] = useSate();
+    const [email, setEmail] = useState();
+    const [password, setPassword] = useState();
+    const [msgTipo, setMsgTipo] = useState();
 
-    function logar(){
-        alert('vamos logar');
+    const auth = getAuth(firebase);
+
+    function logar () {
+        signInWithEmailAndPassword(auth, email, password)
+         .then(response => {
+            setMsgTipo('sucess')   
+            console.log(response);  
+          })
+          .catch((error) => {
+            setMsgTipo('error');
+            console.log(error.message);
+          });
     }
-
+    
     return (
         <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
             <div className="row">
@@ -27,14 +42,19 @@ function Login() {
                     <Form >
                         <Form.Group className="mb-3" controlId="formBasicEmail">
                             <Form.Label>Email</Form.Label>
-                            <Form.Control type="email" placeholder="Entre com email" />
+                            <Form.Control onChange={(e) => setEmail(e.target.value) } type="email"  placeholder="Email" />
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="formBasicPassword">
                             <Form.Label>Senha</Form.Label>
-                            <Form.Control type="password" placeholder="Senha" />
+                            <Form.Control onChange={(e) => setPassword(e.target.value) } type="password"  placeholder="Senha" />
                         </Form.Group>
                        <div className='text-center'>
                         <Button onClick={logar} variant="primary" type="button">Entrar</Button>
+                       </div>
+
+                       <div className="msg-login text-black text-center my-5">
+                            {msgTipo === 'sucess' && <span><strong>WoW!</strong> Você está conectado!</span>}
+                            {msgTipo === 'error' && <span><strong>Ops!</strong> Verifique se a senha ou usuário estão corretos!  </span>}               
                        </div>
                     </Form>
                 </div>
