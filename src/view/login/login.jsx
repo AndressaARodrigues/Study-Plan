@@ -5,7 +5,7 @@ import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
 import Logo from '../../assets/logo-img.png';
 import '../login/login.css';
-//import Navbar from '../../components/navbar/menu';
+
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import firebase from '../../config/firebase';
 import { useSelector, useDispatch } from 'react-redux';

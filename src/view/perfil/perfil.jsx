@@ -1,73 +1,78 @@
 import { useState, useEffect } from 'react';
-import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore'; // Importe Firestore
-import Navbar from '../../components/navbar/menu';
+import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore'; 
+import { getAuth } from 'firebase/auth'; 
+
+import Navbar from '../../components/navbar/mainNavigation';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-
 import './perfil.css';
 
 function Perfil() {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    const [isEditing, setIsEditing] = useState(false);
     const [msgTipo, setMsgTipo] = useState();
-    const [nome, setNome] = useState('');
-    const [matricula, setMatricula] = useState('');
-    const [email, setEmail] = useState('');
-    const [moradia, setMoradia] = useState(false);
-    const [cursoTecnico, setCursoTecnico] = useState(false);
-    const [saudeMental, setSaudeMental] = useState(''); // Pode ser uma string
-    const [vinculoTrabalho, setVinculoTrabalho] = useState('');
+    const [userData, setUserData] = useState({
+        nome: '',
+        matricula: '',
+        email: '',
+        moradia: false,
+        cursoTecnico: false,
+        saudeMental: '',
+        vinculoTrabalho: '',
+    });
+
 
     useEffect(() => {
         const fetchData = async () => {
+            /*if (!user) {
+                // O usuário não está autenticado
+                alert('Usuário não autenticado');
+                return;
+            }*/
+
             const db = getFirestore();
-            const alunoDocRef = doc(db, 'usuarios', 'matricula'); // Substitua 'UID_DO_ALUNO' pelo identificador do aluno
+            const alunoDocRef = doc(db, 'usuarios', user.uid); 
 
             const alunoDoc = await getDoc(alunoDocRef);
 
             if (alunoDoc.exists()) {
-                // Se os dados já existem, atualize os estados com os valores do Firestore
                 const alunoData = alunoDoc.data();
-                setNome(alunoData.nome);
-                setMatricula(alunoData.matricula);
-                setEmail(alunoData.email);
-                setMoradia(alunoData.moradia);
-                setCursoTecnico(alunoData.cursoTecnico);
-                setSaudeMental(alunoData.saudeMental);
-                setVinculoTrabalho(alunoData.vinculoTrabalho);
+                setUserData({
+                    nome: alunoData.nome,
+                    matricula: alunoData.matricula,
+                    email: alunoData.email,
+                    moradia: alunoData.moradia,
+                    cursoTecnico: alunoData.cursoTecnico,
+                    saudeMental: alunoData.saudeMental,
+                    vinculoTrabalho: alunoData.vinculoTrabalho,
+                });
             }
         };
 
         fetchData();
-    }, []);
+    }, [user]);
+
+    function handleEdit() {
+        setIsEditing(!isEditing); 
+    }
 
     function save() {
-        const db = getFirestore(); // Obtenha uma referência para o Firestore
-        const alunoDocRef = doc(db, 'usuarios', matricula); // Substitua 'UID_DO_ALUNO' pelo identificador do aluno
+        /*if (!user) {
+            // O usuário não está autenticado
+            alert('Usuário não autenticado');
+            return;
+        }*/
 
-        const userData = {
-            nome: nome,
-            matricula: matricula,
-            email: email,
-            moradia: moradia,
-            cursoTecnico: cursoTecnico,
-            saudeMental: saudeMental,
-            vinculoTrabalho: vinculoTrabalho,
-        };
-
-        // Adicione os dados do usuário ao Firestore
-        /*addDoc(collection(db, 'usuarios'), userData)
-            .then(() => {
-                setMsgTipo('sucesso');
-                alert('Dados salvos com sucesso.');
-            })
-            .catch((error) => {
-                setMsgTipo('erro');
-                alert('Erro ao salvar os dados: ' + error.message);
-            });*/
+        const db = getFirestore(); 
+        const alunoDocRef = doc(db, 'usuarios', user.uid); 
 
         setDoc(alunoDocRef, userData, { merge: true })
             .then(() => {
                 setMsgTipo('sucesso');
                 alert('Dados salvos com sucesso.');
+                setIsEditing(false);
             })
             .catch((error) => {
                 setMsgTipo('erro');
@@ -79,7 +84,7 @@ function Perfil() {
         <>
             <Navbar />
             <div className='container custom-container'>
-                <p className="h2 text-left my-4">Editar Perfil</p>
+                <p className="h2 text-center my-4">Editar Perfil</p>
                 <div className="container">
                     <form>
                         <div className="form-group mb-4">
@@ -89,9 +94,10 @@ function Perfil() {
                                 className="form-control"
                                 id="nome"
                                 name="nome"
-                                value={nome}
-                                onChange={(e) => setNome(e.target.value)}
-                            />
+                                value={userData.nome}
+                                onChange={(e) => setUserData({ ...userData, nome: e.target.value })}
+                                disabled={!isEditing}
+                           />
                         </div>
 
                         <div className="form-group mb-4">
@@ -101,8 +107,9 @@ function Perfil() {
                                 className="form-control"
                                 id="matricula"
                                 name="matricula"
-                                value={matricula}
-                                onChange={(e) => setMatricula(e.target.value)}
+                                value={userData.matricula}
+                                onChange={(e) => setUserData({ ...userData, matricula: e.target.value })}
+                                disabled={!isEditing}
                             />
                         </div>
 
@@ -113,8 +120,9 @@ function Perfil() {
                                 className="form-control"
                                 id="email"
                                 name="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                value={userData.email}
+                                onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+                                disabled={!isEditing}
                             />
                         </div>
 
@@ -122,8 +130,9 @@ function Perfil() {
                             <label htmlFor="moradia">Você mora sozinho?</label>
                             <Form.Select
                                 aria-label="Default select example"
-                                value={moradia ? 'true' : 'false'}
-                                onChange={(e) => setMoradia(e.target.value === 'true')}
+                                value={userData.moradia}
+                                onChange={(e) => setUserData({ ...userData, moradia: e.target.value})}
+                                disabled={!isEditing}
                             >
                                 <option>Selecione uma opção</option>
                                 <option value="true">Sim</option>
@@ -135,8 +144,9 @@ function Perfil() {
                             <label htmlFor="cursoTecnico">Você possui experiência prévia em um curso técnico?</label>
                             <Form.Select
                                 aria-label="Default select example"
-                                value={cursoTecnico ? 'true' : 'false'}
-                                onChange={(e) => setCursoTecnico(e.target.value === 'true')}
+                                value={userData.cursoTecnico}
+                                onChange={(e) => setUserData({ ...userData, cursoTecnico: e.target.value})}
+                                disabled={!isEditing}
                             >
                                 <option>Selecione uma opção</option>
                                 <option value="true">Sim</option>
@@ -148,8 +158,9 @@ function Perfil() {
                             <label htmlFor="saudeMental">Como classifica sua saúde mental?</label>
                             <Form.Select
                                 aria-label="Default select example"
-                                value={saudeMental}
-                                onChange={(e) => setSaudeMental(e.target.value)}
+                                value={userData.saudeMental}
+                                onChange={(e) => setUserData({ ...userData, saudeMental: e.target.value})}
+                                disabled={!isEditing}
                             >
                                 <option>Selecione uma opção</option>
                                 <option value="Boa">Boa</option>
@@ -162,8 +173,9 @@ function Perfil() {
                             <label htmlFor="vinculoTrabalho">Você possui vínculo de trabalho?</label>
                             <Form.Select
                                 aria-label="Default select example"
-                                value={vinculoTrabalho}
-                                onChange={(e) => setVinculoTrabalho(e.target.value)}
+                                value={userData.vinculoTrabalho}
+                                onChange={(e) => setUserData({ ...userData, vinculoTrabalho: e.target.value})}
+                                disabled={!isEditing}
                             >
                                 <option>Selecione uma opção</option>
                                 <option value="0">Menos de 20 horas / Não possuo</option>
@@ -174,11 +186,18 @@ function Perfil() {
                             </Form.Select>
                         </div>
 
-                        <div>
-                            <Button onClick={save} type="button" variant="primary">
+                        <div className='text-center'>
+                            {isEditing ? (
+                                <Button onClick={save} type="button" variant="primary">
                                 Salvar
-                            </Button>
-                        </div>
+                                </Button>
+                            ) : (
+                                <Button onClick={handleEdit} type="button" variant="info">
+                                Editar
+                                </Button>
+                            )}
+                            </div>
+
                     </form>
                     <div className="msg-login text-center mt-2">
                         {msgTipo === 'sucesso' && <span><strong>WoW!</strong> Dados salvos com sucesso! </span>}

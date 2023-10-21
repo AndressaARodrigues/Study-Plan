@@ -4,6 +4,8 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import './mainNavigation.css';
 import { useSelector, useDispatch } from 'react-redux';
+import Logo from '../../assets/logo.png'
+import './mainNavigation.css'
 
 function MainNavigation() {
     const dispatch = useDispatch();
@@ -13,7 +15,7 @@ function MainNavigation() {
             <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
                 <Container>
                     <Navbar.Brand as={Link} to="/">
-                        <i className="bi bi-book"></i>
+                        <img src={Logo} alt="Logo"  className="logo" />
                     </Navbar.Brand>
                     <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                     <Navbar.Collapse id="responsive-navbar-nav">
