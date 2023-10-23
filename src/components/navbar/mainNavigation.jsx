@@ -21,7 +21,7 @@ function MainNavigation() {
                     <Navbar.Collapse id="responsive-navbar-nav">
                         <Nav className="me-auto"></Nav>
                         <Nav>
-                            {useSelector(state => state.userLogged) > 0 ? (
+                            {useSelector(state => state.user.userLogged) > 0 ? (
                                 <>
                                     <Nav.Link as={Link} to="/editarPerfil">Editar Perfil</Nav.Link>
                                     <Nav.Link onClick={() => dispatch({ type: 'LOG_OUT' }) } as={Link} to="/login">Sair</Nav.Link>

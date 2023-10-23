@@ -8,30 +8,30 @@ import '../login/login.css';
 
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import firebase from '../../config/firebase';
+
 import { useSelector, useDispatch } from 'react-redux';
+import { logIn } from '../../store/userAction';
 
 function Login() {
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
     const [msgTipo, setMsgTipo] = useState();
-    //const [loading, setLoading] = useState();
 
     const dispatch = useDispatch();
     const auth = getAuth(firebase);
+    const userLogged = useSelector((state) => state.user.userLogged);
     
     function logar() {
         signInWithEmailAndPassword(auth, email, password)
             .then(response => {
                 setMsgTipo('success');
                 setTimeout(() => {
-                    dispatch({ type: 'LOG_IN', userEmail: email });
+                    dispatch(logIn(email));
                 }, 2000);
-               // setLoading(0);
                 console.log(response);
             })
             .catch((error) => {
                 setMsgTipo('error');
-               // setLoading(0);
                 console.log(error.message);
             });
     }
@@ -39,8 +39,10 @@ function Login() {
     return (
         <>
             <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
-               
-                {useSelector(state => state.userLogged) > 0 ? <Navigate to='/' /> : null}
+                
+                {/*console.log('Valor de userLogged:', userLogged)*/}
+
+                {userLogged > 0 ? <Navigate to='/' /> : <Navigate to='/login' />}
                
                 <div className="row">
                     <div className="col-md-6 d-flex flex-column justify-content-between">

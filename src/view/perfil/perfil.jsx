@@ -1,88 +1,79 @@
 import { useState, useEffect } from 'react';
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore'; 
 import { getAuth } from 'firebase/auth'; 
+import { useSelector, useDispatch } from 'react-redux';
 
 import Navbar from '../../components/navbar/mainNavigation';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import './perfil.css';
+import { atualizarPerfil } from '../../store/dataAction';
+import firebase from '../../config/firebase';
 
 function Perfil() {
-    const auth = getAuth();
+    const auth = getAuth(firebase);
     const user = auth.currentUser;
+   
+    const userDataFromRedux = useSelector(state => state.perfil.data);  
+    const dispatch = useDispatch();
+
+    const [userData, setUserData] = useState(userDataFromRedux);
 
     const [isEditing, setIsEditing] = useState(false);
-    const [msgTipo, setMsgTipo] = useState();
-    const [userData, setUserData] = useState({
-        nome: '',
-        matricula: '',
-        email: '',
-        moradia: false,
-        cursoTecnico: false,
-        saudeMental: '',
-        vinculoTrabalho: '',
-    });
-
-
+   
     useEffect(() => {
-        const fetchData = async () => {
-            /*if (!user) {
-                // O usuário não está autenticado
-                alert('Usuário não autenticado');
-                return;
-            }*/
-
-            const db = getFirestore();
-            const alunoDocRef = doc(db, 'usuarios', user.uid); 
-
-            const alunoDoc = await getDoc(alunoDocRef);
-
-            if (alunoDoc.exists()) {
-                const alunoData = alunoDoc.data();
-                setUserData({
-                    nome: alunoData.nome,
-                    matricula: alunoData.matricula,
-                    email: alunoData.email,
-                    moradia: alunoData.moradia,
-                    cursoTecnico: alunoData.cursoTecnico,
-                    saudeMental: alunoData.saudeMental,
-                    vinculoTrabalho: alunoData.vinculoTrabalho,
-                });
-            }
-        };
-
-        fetchData();
-    }, [user]);
-
-    function handleEdit() {
-        setIsEditing(!isEditing); 
-    }
-
-    function save() {
-        /*if (!user) {
-            // O usuário não está autenticado
-            alert('Usuário não autenticado');
-            return;
+        if (user) {
+            const fetchData = async () => {
+                const db = getFirestore();
+                const userDocRef = doc(db, 'usuarios', user.uid);
+                const userDoc = await getDoc(userDocRef);
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    dispatch(atualizarPerfil(userData));
+                    setUserData(userData); 
+                    
+                    //localStorage.setItem('userData', JSON.stringify(userData));
+                }
+            };
+            fetchData();
+        } /*else {
+            // Recupere os dados do Local Storage, se existirem
+            const storedData = localStorage.getItem('userData');
+            if (storedData) {
+                setUserData(JSON.parse(storedData));
+            }*
         }*/
+    }, [dispatch, user]);
 
-        const db = getFirestore(); 
-        const alunoDocRef = doc(db, 'usuarios', user.uid); 
-
-        setDoc(alunoDocRef, userData, { merge: true })
-            .then(() => {
-                setMsgTipo('sucesso');
-                alert('Dados salvos com sucesso.');
+    const save = async () => {
+        try {
+            if (user) {
+                // Salvar os dados no Firebase
+                const db = getFirestore();
+                const userDocRef = doc(db, 'usuarios', user.uid);
+                await setDoc(userDocRef, userData);
                 setIsEditing(false);
-            })
-            .catch((error) => {
-                setMsgTipo('erro');
-                alert('Erro ao salvar os dados: ' + error.message);
-            });
+                
+                // Atualizar os dados no Redux Store
+                dispatch(atualizarPerfil(userData));
+                //localStorage.setItem('userData', JSON.stringify(userData));
+            } else {
+                console.error('Usuário não autenticado.');
+            }
+        } catch (error) {
+            console.error('Erro ao salvar os dados:', error);
+        }
+    };
+
+    const handleEdit = () => {
+        setIsEditing(true);
     }
 
     return (
         <>
             <Navbar />
+            {/*console.log('Valor de userData:', userDataFromRedux)*/}
+
             <div className='container custom-container'>
                 <p className="h2 text-center my-4">Editar Perfil</p>
                 <div className="container">
@@ -199,10 +190,7 @@ function Perfil() {
                             </div>
 
                     </form>
-                    <div className="msg-login text-center mt-2">
-                        {msgTipo === 'sucesso' && <span><strong>WoW!</strong> Dados salvos com sucesso! </span>}
-                        {msgTipo === 'erro' && <span><strong>Ops!</strong> Não foi possível salvar os dados!  </span>}
-                    </div>
+                    
                 </div>
             </div>
         </>
