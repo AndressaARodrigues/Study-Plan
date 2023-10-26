@@ -1,199 +1,88 @@
-//import { useSelector } from 'react-redux';
+import { useState, useEffect } from 'react';
+import { getFirestore, collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import Navbar from '../../components/navbar/mainNavigation';
-import AccordionComponent from '../../components/accordion/accordion';
+import DisciplinasOfertadas from '../../components/disciplinasOfertadas/disciplinasOfertadas';
 import './home.css';
+import { getAuth } from 'firebase/auth'; 
+import firebase from '../../config/firebase';
 
-const accordionData = [
-    {
-        title: "Álgebra Linear",
-        codigoDisciplina: "Al0335",
-        cargaHoraria: "60 horas",
-        tipoDisciplina: "Disciplina complementar",
-    },
-    {
-        title: "Calculo I",
-        codigoDisciplina: "Al0335",
-        cargaHoraria: "60 horas",
-        tipoDisciplina: "Disciplina complementar",
-    },
-    {
-        title: "Circuitos Digitais",
-        codigoDisciplina: "Al0335",
-        cargaHoraria: "60 horas",
-        tipoDisciplina: "Disciplina complementar",
-    },
-    {
-        title: "Estrutura de Dados I",
-        codigoDisciplina: "Al0335",
-        cargaHoraria: "60 horas",
-        tipoDisciplina: "Disciplina complementar",
-    }
-];
-
-const accordionData2 = [
-    {
-        title: "Álgebra Linear",
-        codigoDisciplina: "Al0335",
-        cargaHoraria: "60 horas",
-        tipoDisciplina: "Disciplina obrigatória",
-    },
-    {
-        title: "Calculo I",
-        codigoDisciplina: "Al0335",
-        cargaHoraria: "60 horas",
-        tipoDisciplina: "Disciplina obrigatória",
-    },
-    {
-        title: "Circuitos Digitais",
-        codigoDisciplina: "Al0335",
-        cargaHoraria: "60 horas",
-        tipoDisciplina: "Disciplina obrigatória",
-    },
-    {
-        title: "Estrutura de Dados I",
-        codigoDisciplina: "Al0335",
-        cargaHoraria: "60 horas",
-        tipoDisciplina: "Disciplina obrigatória",
-    },
-    {
-        title: "Matemática Discreta",
-        codigoDisciplina: "Al0335",
-        cargaHoraria: "60 horas",
-        tipoDisciplina: "Disciplina obrigatória",
-    }
-];
-
-const accordionData4 = [
-    {
-        title: "Arquitetura e Organização de Computadores II",
-        codigoDisciplina: "Al0335",
-        cargaHoraria: "60 horas",
-        tipoDisciplina: "Disciplina obrigatória",
-    },
-    {
-        title: "Banco de Dados I",
-        codigoDisciplina: "Al0335",
-        cargaHoraria: "60 horas",
-        tipoDisciplina: "Disciplina obrigatória",
-    },
-    {
-        title: "Computação Gráfica",
-        codigoDisciplina: "Al0335",
-        cargaHoraria: "60 horas",
-        tipoDisciplina: "Disciplina obrigatória",
-    },
-    {
-        title: "Programação Orientada a Objetos",
-        codigoDisciplina: "Al0335",
-        cargaHoraria: "60 horas",
-        tipoDisciplina: "Disciplina obrigatória",
-    },
-    {
-        title: "Projeto e Análise de Algoritmos",
-        codigoDisciplina: "Al0335",
-        cargaHoraria: "60 horas",
-        tipoDisciplina: "Disciplina obrigatória",
-    }
-];
-
-const accordionData6 = [
-    {
-        title: "Computabilidade",
-        codigoDisciplina: "Al0335",
-        cargaHoraria: "60 horas",
-        tipoDisciplina: "Disciplina obrigatória",
-    },
-    {
-        title: "Engenharia de Software II",
-        codigoDisciplina: "Al0335",
-        cargaHoraria: "60 horas",
-        tipoDisciplina: "Disciplina obrigatória",
-    },
-    {
-        title: "Redes de Computadores",
-        codigoDisciplina: "Al0335",
-        cargaHoraria: "60 horas",
-        tipoDisciplina: "Disciplina obrigatória",
-    }
-];
-
-const accordionData8 = [
-    {
-        title: "Sistemas da Informação",
-        codigoDisciplina: "Al0335",
-        cargaHoraria: "60 horas",
-        tipoDisciplina: "Disciplina obrigatória",
-    }
-];
+/*const gerarRecomendacao = () => {
+    alert("Gerando sua Recomendação!");
+}*/
 
 function Home() {
+    const auth = getAuth(firebase);
+    const user = auth.currentUser;
+
+    const [capacidadeMochila, setCapacidadeMochila] = useState(null);
+    const [disciplinas, setDisciplinas] = useState([]);
+
+    useEffect(() => {
+        if (user){
+             // Função para buscar a capacidadeMochila do banco de dados Firebase
+             const buscarCapacidadeMochila = async () => {
+                const db = getFirestore();
+                const usuariosCollection = collection(db, 'usuarios');
+                const usuarioDoc = doc(usuariosCollection, user.uid); 
+            
+                try {
+                    const usuarioDocSnapshot = await getDoc(usuarioDoc);
+                    if (usuarioDocSnapshot.exists()) {
+                        const usuarioData = usuarioDocSnapshot.data();
+                        if (usuarioData && usuarioData.capacidadeMochila !== undefined) {
+                            setCapacidadeMochila(usuarioData.capacidadeMochila);
+                        } else {
+                            console.error('Campo capacidadeMochila não encontrado no documento do usuário.');
+                        }
+                    } else {
+                        console.error('Usuário não encontrado.');
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar capacidadeMochila:', error);
+                }
+             };
+        
+            // Função para buscar as disciplinas do banco de dados Firebase
+            const buscarDisciplinas = async () => {
+                const db = getFirestore();
+                const userId = `/usuarios/${user.uid}/disciplinas`;
+                const disciplinasCollection = collection(db, userId);
+                const disciplinasSnapshot = await getDocs(disciplinasCollection);
+
+                const disciplinasList = [];
+                disciplinasSnapshot.forEach((doc) => {
+                    disciplinasList.push(doc.data());
+                });
+
+                setDisciplinas(disciplinasList);
+            };
+
+            // Chamar as funções de busca ao montar o componente
+            buscarCapacidadeMochila();
+            buscarDisciplinas();
+        }
+    }, [user]);
+
+    const gerarRecomendacao = () => {
+        alert("Gerando sua Recomendação!");
+        // Você pode usar os valores de capacidadeMochila e disciplinas aqui para gerar a recomendação.
+    }
+
     return (
         <>
             <Navbar/>
             <div className='conteiner custom-container2'>
-                <button className='my-4 custom-button'> + Gerar Recomendação</button>
-                <p className="h2 text-center my-4">Disciplinas Ofertadas 2022/2</p>
-                <div>
-                    <p><b>2º Semestre</b></p>
-                    {accordionData2.map((item, index) => (
-                        <AccordionComponent 
-                        key={index} 
-                        title={item.title} 
-                        codigoDisciplina={item.codigoDisciplina}
-                        cargaHoraria={item.cargaHoraria}
-                        tipoDisciplina={item.tipoDisciplina}
-                        />
+                <button onClick={gerarRecomendacao} className='my-4 custom-button'> + Gerar Recomendação</button>
+                <p>Capacidade da Mochila: {capacidadeMochila}</p>
+                <p>Disciplinas:</p>
+                <ul>
+                    {disciplinas.map((disciplina, index) => (
+                        <li key={index}>{disciplina.name}</li>
                     ))}
-                </div>
-                <div>
-                    <p><b>4º Semestre</b></p>
-                    {accordionData4.map((item, index) => (
-                        <AccordionComponent 
-                            key={index} 
-                            title={item.title} 
-                            codigoDisciplina={item.codigoDisciplina} 
-                            cargaHoraria={item.cargaHoraria}
-                            tipoDisciplina={item.tipoDisciplina}
-                        />
-                    ))}
-                </div>
-                <div>
-                    <p><b>6º Semestre</b></p>
-                    {accordionData6.map((item, index) => (
-                        <AccordionComponent 
-                            key={index} 
-                            title={item.title} 
-                            codigoDisciplina={item.codigoDisciplina} 
-                            cargaHoraria={item.cargaHoraria}
-                            tipoDisciplina={item.tipoDisciplina}
-                        />
-                    ))}
-                </div>
-                <div>
-                    <p><b>8º Semestre</b></p>
-                    {accordionData8.map((item, index) => (
-                        <AccordionComponent 
-                            key={index} 
-                            title={item.title} 
-                            codigoDisciplina={item.codigoDisciplina} 
-                            cargaHoraria={item.cargaHoraria}
-                            tipoDisciplina={item.tipoDisciplina}
-                        />
-                    ))}
-                </div>
-                <div>
-                    <p><b>Disciplinas Complementares</b></p>
-                    {accordionData.map((item, index) => (
-                        <AccordionComponent 
-                            key={index} 
-                            title={item.title} 
-                            codigoDisciplina={item.codigoDisciplina} 
-                            cargaHoraria={item.cargaHoraria}
-                            tipoDisciplina={item.tipoDisciplina}
-                        />
-                    ))}
-                </div>
+                </ul>
             </div>
+
+            <DisciplinasOfertadas/>
         </>
     );
 }

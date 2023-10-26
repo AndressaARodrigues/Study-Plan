@@ -21,6 +21,40 @@ function Perfil() {
 
     const [isEditing, setIsEditing] = useState(false);
    
+    function calcularCapacidadeMochila(userData){
+        
+        // Valores atribuídos a cada resposta
+        const valores = {
+            moraSozinho: { true: -2, false: 0 },
+            cursoTecnico: { true: 0, false: -1 },
+            vinculoTrabalho: { 0: 0, 20: -6, 30: -8, 40: -10, 50: -12 },
+            saudeMental: { Bom: 0, Regular: -2, Ruim: -5 },
+        };
+
+        // Inicializar a capacidade com 32
+        let capacidadeMochila = 32;
+        // Calcular a capacidade com base nas respostas do usuário
+        capacidadeMochila += valores.moraSozinho[userData.moradia];
+        capacidadeMochila += valores.cursoTecnico[userData.cursoTecnico];
+        capacidadeMochila += valores.vinculoTrabalho[userData.vinculoTrabalho];
+        capacidadeMochila += valores.saudeMental[userData.saudeMental];
+
+        /* Outro jeito de fazer
+        const respostas = {
+            moraSozinho,
+            cursoTecnico,
+            vinculoTrabalho,
+            saudeMental,
+        };
+        Object.keys(userData).forEach((pergunta) => {
+            const resposta = userData[pergunta];
+            capacidadeMochila += valores[pergunta][resposta];
+        }); 
+        */
+
+        return capacidadeMochila;
+    }
+
     useEffect(() => {
         if (user) {
             const fetchData = async () => {
@@ -31,32 +65,26 @@ function Perfil() {
                     const userData = userDoc.data();
                     dispatch(atualizarPerfil(userData));
                     setUserData(userData); 
-                    
-                    //localStorage.setItem('userData', JSON.stringify(userData));
                 }
             };
             fetchData();
-        } /*else {
-            // Recupere os dados do Local Storage, se existirem
-            const storedData = localStorage.getItem('userData');
-            if (storedData) {
-                setUserData(JSON.parse(storedData));
-            }*
-        }*/
+        } 
     }, [dispatch, user]);
 
     const save = async () => {
         try {
             if (user) {
+                // Calcular a capacidade da mochila
+                const novaCapacidade = calcularCapacidadeMochila(userData);
+
                 // Salvar os dados no Firebase
                 const db = getFirestore();
                 const userDocRef = doc(db, 'usuarios', user.uid);
-                await setDoc(userDocRef, userData);
+                await setDoc(userDocRef, { ...userData, capacidadeMochila: novaCapacidade });
                 setIsEditing(false);
                 
                 // Atualizar os dados no Redux Store
-                dispatch(atualizarPerfil(userData));
-                //localStorage.setItem('userData', JSON.stringify(userData));
+                dispatch(atualizarPerfil({ ...userData, capacidadeMochila: novaCapacidade }));
             } else {
                 console.error('Usuário não autenticado.');
             }
@@ -183,7 +211,7 @@ function Perfil() {
                                 Salvar
                                 </Button>
                             ) : (
-                                <Button onClick={handleEdit} type="button" variant="info">
+                                <Button onClick={handleEdit} type="button" variant="secondary">
                                 Editar
                                 </Button>
                             )}
