@@ -1,37 +1,39 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom'; 
+import { useSelector, useDispatch } from 'react-redux';
+
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import firebase from '../../config/firebase';
+
+import { logIn } from '../../store/userAction';
+
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
 import Logo from '../../assets/logo-img.png';
 import '../login/login.css';
 
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import firebase from '../../config/firebase';
-
-import { useSelector, useDispatch } from 'react-redux';
-import { logIn } from '../../store/userAction';
-
 function Login() {
-    const [email, setEmail] = useState();
-    const [password, setPassword] = useState();
-    const [msgTipo, setMsgTipo] = useState();
+    const auth = getAuth(firebase);
 
     const dispatch = useDispatch();
-    const auth = getAuth(firebase);
     const userLogged = useSelector((state) => state.user.userLogged);
     
+    const [email, setEmail] = useState();
+    const [password, setPassword] = useState();
+    const [msgType, setMsgType] = useState();
+
     function logar() {
         signInWithEmailAndPassword(auth, email, password)
             .then(response => {
-                setMsgTipo('success');
+                setMsgType('success');
                 setTimeout(() => {
                     dispatch(logIn(email));
                 }, 2000);
                 console.log(response);
             })
             .catch((error) => {
-                setMsgTipo('error');
+                setMsgType('error');
                 console.log(error.message);
             });
     }
@@ -51,8 +53,8 @@ function Login() {
                         </div>
                     </div>
                     <div className="col-md-6 d-flex flex-column justify-content-between">
-                        <p className="h1 text-center font-weight-bold">Bem vindo!</p>
-                        <p className="lead text-center">Ao Sistema de Recomendação de Planos de Ensino</p>
+                        <p className="h1 text-center font-weight-bold"><strong>Study Plan</strong></p>
+                        <p className="lead text-center">Sistema para Recomendação de Planos de Estudos</p>
                         <Form>
                             <Form.Group className="mb-3" controlId="formBasicEmail">
                                 <Form.Label>Email</Form.Label>
@@ -65,12 +67,10 @@ function Login() {
                             <div className='text-center'>
                                 <Button onClick={logar} variant="primary" type="button">Entrar</Button>
                             </div>
-                            
                             <div className="msg-login text-black text-center my-5">
-                                {msgTipo === 'success' && <span><strong>WoW!</strong> Você está conectado!</span>}
-                                {msgTipo === 'error' && <span><strong>Ops!</strong> Verifique se a senha ou usuário estão corretos!  </span>}
+                                {msgType === 'success' && <span className="alert alert-success rounded mt-2"><strong>WoW!</strong> Você está conectado!</span>}
+                                {msgType === 'error' && <span className="alert alert-danger rounded mt-2"><strong>Ops!</strong> Verifique se a senha ou usuário estão corretos!  </span>}
                             </div>
-                            
                         </Form>
                     </div>
                 </div>

@@ -15,10 +15,9 @@ import './perfil.css';
 function Perfil() {
     const auth = getAuth(firebase);
     const user = auth.currentUser;
-   
-    const userDataFromRedux = useSelector(state => state.profile.data);  
-    const dispatch = useDispatch();
 
+    const dispatch = useDispatch();
+    const userDataFromRedux = useSelector(state => state.profile.data);  
     const [userData, setUserData] = useState(userDataFromRedux);
 
     const [isEditing, setIsEditing] = useState(false);
