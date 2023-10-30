@@ -113,7 +113,7 @@ function Home() {
                   return prereqDisciplina && prereqDisciplina.include;
                 }
                 return true;
-              });
+            });
               
             // Chame a função knapsack com as disciplinas e a capacidade da mochila
             const resultado = knapsack(validItemsToCalculate, capacidadeMochila);

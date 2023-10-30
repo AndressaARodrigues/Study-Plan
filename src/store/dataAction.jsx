@@ -1,4 +1,4 @@
-export const atualizarPerfil = (data) => {
+export const updateProfile = (data) => {
   return {
     type: 'UPDATE_DATA',
     payload: data,
