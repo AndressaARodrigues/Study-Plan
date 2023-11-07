@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
-//import { useSelector } from 'react-redux';
 
 import { getFirestore, collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth'; 
 
 import firebase from '../../config/firebase';
-//import { setRecommendations } from '../../store/recommendationAction';
 
 import Navbar from '../../components/navbar/mainNavigation';
 import DisciplinasOfertadas from '../../components/disciplinasOfertadas/disciplinasOfertadas';
@@ -16,23 +14,23 @@ function Home() {
     const user = auth.currentUser;
 
     const [capacidadeMochila, setCapacidadeMochila] = useState(null);
-    const [disciplinas, setDisciplinas] = useState([]);
+    const [disciplinas, setDisciplinesUser] = useState([]);
     const [disciplinasRecomendadas, setDisciplinasRecomendadas] = useState([]);
 
     useEffect(() => {
         if (user){
              // Função para buscar a capacidadeMochila do banco de dados Firebase
-             const buscarCapacidadeMochila = async () => {
+            const fetchKnapsackCapacity = async () => {
                 const db = getFirestore();
-                const usuariosCollection = collection(db, 'usuarios');
-                const usuarioDoc = doc(usuariosCollection, user.uid); 
+                const usersCollection = collection(db, 'usuarios');
+                const userDoc = doc(usersCollection, user.uid); 
             
                 try {
-                    const usuarioDocSnapshot = await getDoc(usuarioDoc);
-                    if (usuarioDocSnapshot.exists()) {
-                        const usuarioData = usuarioDocSnapshot.data();
-                        if (usuarioData && usuarioData.capacidadeMochila !== undefined) {
-                            setCapacidadeMochila(usuarioData.capacidadeMochila);
+                    const userDocSnapshot = await getDoc(userDoc);
+                    if (userDocSnapshot.exists()) {
+                        const userData = userDocSnapshot.data();
+                        if (userData && userData.capacidadeMochila !== undefined) {
+                            setCapacidadeMochila(userData.capacidadeMochila);
                         } else {
                             console.error('Campo capacidadeMochila não encontrado no documento do usuário.');
                         }
@@ -42,26 +40,26 @@ function Home() {
                 } catch (error) {
                     console.error('Erro ao buscar capacidadeMochila:', error);
                 }
-             };
+            };
         
-            // Função para buscar as disciplinas do banco de dados Firebase
-            const buscarDisciplinas = async () => {
+            // Função para buscar as disciplinas dos Usuários do banco de dados Firebase
+            const fetchDisciplinesUser = async () => {
                 const db = getFirestore();
                 const userId = `/usuarios/${user.uid}/disciplinas`;
-                const disciplinasCollection = collection(db, userId);
-                const disciplinasSnapshot = await getDocs(disciplinasCollection);
+                const disciplinesUserCollection = collection(db, userId);
+                const disciplinesUserSnapshot = await getDocs(disciplinesUserCollection);
 
-                const disciplinasList = [];
-                disciplinasSnapshot.forEach((doc) => {
-                    disciplinasList.push(doc.data());
+                const disciplinesUserList = [];
+                disciplinesUserSnapshot.forEach((doc) => {
+                    disciplinesUserList.push(doc.data());
                 });
 
-                setDisciplinas(disciplinasList);
+                setDisciplinesUser(disciplinesUserList);
             };
-
+            
             // Chamar as funções de busca ao montar o componente
-            buscarCapacidadeMochila();
-            buscarDisciplinas();
+            fetchKnapsackCapacity();
+            fetchDisciplinesUser();
         }
     }, [user]);
 
@@ -80,7 +78,6 @@ function Home() {
           }
         }
     
-        // Reconstruct the solution
         const selectedItems = [];
         let i = n;
         let w = capacidadeMochila;

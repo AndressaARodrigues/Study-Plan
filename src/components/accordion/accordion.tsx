@@ -25,9 +25,10 @@ function AccordionComponent({ title, codigoDisciplina, cargaHoraria, tipoDiscipl
       </div>
       {isOpen && (
         <div className='accordion-info'>
-            <p>Codigo da disciplina: {codigoDisciplina}</p>
+            {/*<p>Codigo da disciplina: {codigoDisciplina}</p>
             <p>Carga Horária: {cargaHoraria}</p>
-            <p>{tipoDisciplina}</p>
+            <p>{tipoDisciplina}</p>*/}
+            teste
         </div>
       )}
     </div>
