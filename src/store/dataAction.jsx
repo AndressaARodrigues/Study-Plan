@@ -1,6 +1,13 @@
-export const updateProfile = (data) => {
+export const updateProfile = () => {
   return {
     type: 'UPDATE_DATA',
-    payload: data,
+    //payload: data,
+    nome: '',
+    matricula: '',
+    email: '',
+    moradia: '',
+    curso_tecnico: '',
+    saude_mental: '',
+    vinculo_trabalho: '',
   };
 };

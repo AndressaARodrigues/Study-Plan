@@ -1,0 +1,20 @@
+.accordion-container {
+    width: 600px;
+    margin-bottom: 20px;
+    display: flex; 
+    flex-direction: column; 
+}
+  
+.title-recomendada {
+    width: 600px;
+    margin-bottom: 20px;
+    display: flex; 
+    flex-direction: column; 
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #d9d9d9;
+}

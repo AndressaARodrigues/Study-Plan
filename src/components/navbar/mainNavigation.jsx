@@ -4,7 +4,7 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import './mainNavigation.css';
 import { useSelector, useDispatch } from 'react-redux';
-import Logo from '../../assets/logo.png'
+//import Logo from '../../assets/logo.png'
 import './mainNavigation.css'
 
 function MainNavigation() {
@@ -15,7 +15,8 @@ function MainNavigation() {
             <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
                 <Container>
                     <Navbar.Brand as={Link} to="/">
-                        <img src={Logo} alt="Logo"  className="logo" />
+                        {/*<img src={Logo} alt="Logo"  className="logo" />*/}
+                        <p>Study Plan</p>
                     </Navbar.Brand>
                     <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                     <Navbar.Collapse id="responsive-navbar-nav">
@@ -23,7 +24,8 @@ function MainNavigation() {
                         <Nav>
                             {useSelector(state => state.user.userLogged) > 0 ? (
                                 <>
-                                    <Nav.Link as={Link} to="/editarPerfil">Editar Perfil</Nav.Link>
+                                    <Nav.Link as={Link} to="/">ínicio</Nav.Link>
+                                    <Nav.Link as={Link} to="/editarPerfil">Perfil</Nav.Link>
                                     <Nav.Link onClick={() => dispatch({ type: 'LOG_OUT' }) } as={Link} to="/login">Sair</Nav.Link>
                                 </>
                             ) : (

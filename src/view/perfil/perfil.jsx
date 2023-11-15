@@ -26,20 +26,20 @@ function Perfil() {
     function calculateCapacityknapsack(userData){
         // Valores atribuídos a cada resposta
         const values = {
-            moraSozinho: { true: 2, false: 0 },
-            cursoTecnico: { true: 0, false: 1 },
-            vinculoTrabalho: { 0: 0, 20: 6, 30: 8, 40: 10, 44: 12 },
-            saudeMental: { Bom: 0, Regular: 2, Ruim: 5 },
+            moradia: { Sim: 2, Nao: 0 },
+            curso_tecnico: { sim: 0, Nao: 1 },
+            vinculo_trabalho: { 0: 0, 20: 6, 30: 8, 40: 10, 44: 12 },
+            saude_mental: { Bom: 0, Regular: 2, Ruim: 5 },
         };
 
         // Inicializa a capacidade da mochila com 32
         let initialCapacity = 32;
         let capacityStudent = 0;
         // Calcular a capacidade com base nas respostas do usuário
-        capacityStudent = values.moraSozinho[userData.moradia] 
-                        + values.cursoTecnico[userData.cursoTecnico] 
-                        + values.vinculoTrabalho[userData.vinculoTrabalho] 
-                        + values.saudeMental[userData.saudeMental];
+        capacityStudent = values.moradia[userData.moradia] 
+                        + values.curso_tecnico[userData.curso_tecnico] 
+                        + values.vinculo_trabalho[userData.vinculo_trabalho] 
+                        + values.saude_mental[userData.saude_mental];
 
         const knapSackCapacity = initialCapacity - capacityStudent;
 
@@ -71,12 +71,12 @@ function Perfil() {
                 // Salvar os dados no Firebase
                 const db = getFirestore();
                 const userDocRef = doc(db, 'usuarios', user.uid);
-                await setDoc(userDocRef, { ...userData, capacidadeMochila: newCapacity });
+                await setDoc(userDocRef, { ...userData, capacidade_mochila: newCapacity });
                 setIsEditing(false);
                 
                 console.log(newCapacity);
                 // Atualizar os dados no Redux Store
-                dispatch(updateProfile({ ...userData, capacidadeMochila: newCapacity }));
+                dispatch(updateProfile({ ...userData, capacidade_mochila: newCapacity }));
                 
                 // Define a mensagem de feedback
                 setFeedback('Informações salvas com sucesso.');
@@ -163,43 +163,43 @@ function Perfil() {
                                 disabled={!isEditing}
                             >
                                 <option>Selecione uma opção</option>
-                                <option value="true">Sim</option>
-                                <option value="false">Não</option>
+                                <option value="Sim">Sim</option>
+                                <option value="Nao">Não</option>
                             </Form.Select>
                         </div>
 
                         <div className="form-group mb-4">
-                            <label htmlFor="cursoTecnico">Você possui experiência prévia em um curso técnico?</label>
+                            <label htmlFor="curso_tecnico">Você possui experiência prévia em um curso técnico?</label>
                             <Form.Select
-                                value={userData.cursoTecnico}
-                                onChange={(e) => setUserData({ ...userData, cursoTecnico: e.target.value})}
+                                value={userData.curso_tecnico}
+                                onChange={(e) => setUserData({ ...userData, curso_tecnico: e.target.value})}
                                 disabled={!isEditing}
                             >
                                 <option>Selecione uma opção</option>
-                                <option value="true">Sim</option>
-                                <option value="false">Não</option>
+                                <option value="Sim">Sim</option>
+                                <option value="Nao">Não</option>
                             </Form.Select>
                         </div>
 
                         <div className="form-group mb-4">
-                            <label htmlFor="saudeMental">Como classifica sua saúde mental?</label>
+                            <label htmlFor="saude_mental">Como classifica sua saúde mental?</label>
                             <Form.Select
-                                value={userData.saudeMental}
-                                onChange={(e) => setUserData({ ...userData, saudeMental: e.target.value})}
+                                value={userData.saude_mental}
+                                onChange={(e) => setUserData({ ...userData, saude_mental: e.target.value})}
                                 disabled={!isEditing}
                             >
                                 <option>Selecione uma opção</option>
-                                <option value="Boa">Boa</option>
+                                <option value="Bom">Bom</option>
                                 <option value="Regular">Regular</option>
                                 <option value="Ruim">Ruim</option>
                             </Form.Select>
                         </div>
 
                         <div className="form-group mb-4">
-                            <label htmlFor="vinculoTrabalho">Você possui vínculo de trabalho?</label>
+                            <label htmlFor="vinculo_trabalho">Você possui vínculo de trabalho?</label>
                             <Form.Select
-                                value={userData.vinculoTrabalho}
-                                onChange={(e) => setUserData({ ...userData, vinculoTrabalho: e.target.value})}
+                                value={userData.vinculo_trabalho}
+                                onChange={(e) => setUserData({ ...userData, vinculo_trabalho: e.target.value})}
                                 disabled={!isEditing}
                             >
                                 <option>Selecione uma opção</option>

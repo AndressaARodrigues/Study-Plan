@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './accordion.css';
 
-function AccordionComponent({ title, codigoDisciplina, cargaHoraria, tipoDisciplina}) {
+function AccordionComponent({ title }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleAccordion = () => {
@@ -25,10 +25,7 @@ function AccordionComponent({ title, codigoDisciplina, cargaHoraria, tipoDiscipl
       </div>
       {isOpen && (
         <div className='accordion-info'>
-            {/*<p>Codigo da disciplina: {codigoDisciplina}</p>
-            <p>Carga Horária: {cargaHoraria}</p>
-            <p>{tipoDisciplina}</p>*/}
-            teste
+          {/* Conteúdo adicional pode ser adicionado aqui se necessário */}
         </div>
       )}
     </div>

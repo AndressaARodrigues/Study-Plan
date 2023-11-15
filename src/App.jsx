@@ -7,7 +7,6 @@ import Login from './view/login/login';
 import Home from './view/home/home';
 import EditarPerfil from './view/perfil/perfil';
 
-
 function App() {
   return (
     <Provider store={store}>
