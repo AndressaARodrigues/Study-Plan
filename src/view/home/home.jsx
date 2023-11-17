@@ -17,7 +17,10 @@ function Home() {
     const [resultDisciplinas, setResultDisciplinas] = useState([]);
     const [mostrarDisciplinasRecomendadas, setMostrarDisciplinasRecomendadas] = useState(false);
 
-    const semestreIdExemplo = 'twyH3UVeA28bvH82xBJ2';
+    const [loading, setLoading] = useState(false); // New state for loading
+    const [loadingOfertadas, setLoadingOfertadas] = useState(true); // New state for loading disciplinas ofertadas
+
+    const semestreIdExemplo = 'twyH3UVeA28bvH82xBJ2';//'ZmG0tLrmaEswlMjhNNam';
        
     async function obterNomesDisciplinas(referencias) {
         const nomesDisciplinas = [];
@@ -41,6 +44,39 @@ function Home() {
                         nomesDisciplinas[periodo].push({
                             id: referencia.id,
                             nome: disciplinaDados.disciplina_nome,
+                            codigo: disciplinaDados.disciplina_codigo,
+                            periodo: disciplinaDados.disciplina_periodo,
+                            peso: disciplinaDados.peso,
+                        });
+                    } else {
+                        console.log('Disciplina não encontrada:', referencia.id);
+                    }
+                } else {
+                    console.error('Referência inválida:', referencia);
+                }
+            } catch (error) {
+                console.error('Erro ao obter disciplina:', error);
+            }
+        }
+
+        return nomesDisciplinas;
+    }
+
+    async function obterNomesDisciplinasOfertadas(referencias) {
+        const nomesDisciplinasOfertadas = [];
+
+        for (const referencia of referencias) {
+            try {
+                // Verifique se a referência é uma instância válida de DocumentReference
+                if (referencia instanceof DocumentReference) {
+                    const disciplinaDocSnapshot = await getDoc(referencia);
+
+                    if (disciplinaDocSnapshot.exists()) {
+                        const disciplinaDados = disciplinaDocSnapshot.data();
+
+                        nomesDisciplinasOfertadas.push({
+                            id: referencia.id,
+                            nome: disciplinaDados.disciplina_nome,
                             peso: disciplinaDados.peso,
                             valor: disciplinaDados.valor,
                         });
@@ -55,7 +91,7 @@ function Home() {
             }
         }
 
-        return nomesDisciplinas;
+        return nomesDisciplinasOfertadas;
     }
 
     useEffect(() => {
@@ -142,9 +178,9 @@ function Home() {
                             disciplinasNaoNoUsuario = disciplinasNaoNoUsuario.filter(Boolean);
 
                             // Mapeie as disciplinas não encontradas para obter os nomes
-                            const nomesDisciplinasNaoNoUsuario = await obterNomesDisciplinas(disciplinasNaoNoUsuario);
+                            const nomesDisciplinasNaoNoUsuario = await obterNomesDisciplinasOfertadas(disciplinasNaoNoUsuario);
                 
-                            //console.log('Disciplinas não vencidas pelo usuário, e ofertadas no semestre:', nomesDisciplinasNaoNoUsuario);
+                            console.log('Disciplinas não vencidas pelo usuário, e ofertadas no semestre:', nomesDisciplinasNaoNoUsuario);
                             setNomesDisciplinasNaoNoUsuario(nomesDisciplinasNaoNoUsuario);
                         } else {
                           console.error('Arrays de disciplinas do usuário ou do semestre não estão definidos corretamente.');
@@ -186,11 +222,14 @@ function Home() {
                 //console.log('Nomes das Disciplinas:', nomesDisciplinas);
 
                 setNomesDisciplinas(nomesDisciplinas);
+                setLoadingOfertadas(false);
             } else {
                 console.log('Semestre não encontrado');
+                setLoadingOfertadas(false);
             }
         } catch (error) {
             console.error('Erro ao obter nomes das disciplinas por semestre:', error);
+            setLoadingOfertadas(false);
         }
        };
 
@@ -199,6 +238,7 @@ function Home() {
     }, [user]);
 
     const knapsack = (items, capacidadeMochila) => {
+       // console.log('disciplinas sorteadas',items);
         const n = items.length;
         const dp = new Array(n + 1).fill(0).map(() => new Array(capacidadeMochila + 1).fill(0));
     
@@ -231,21 +271,29 @@ function Home() {
     };
 
     const knapsackButtonClick = () => {
-        if (nomesDisciplinasNaoNoUsuario && capacidadeMochila) {
-            const items = nomesDisciplinasNaoNoUsuario
+        if (nomesDisciplinasNaoNoUsuario && capacidadeMochila > 0) {
+            setLoading(true);
+            
+            const items= nomesDisciplinasNaoNoUsuario
                 .reduce((acc, curr) => acc.concat(curr), []) 
                 .map(disciplina => ({
                     nome: disciplina.nome,
-                    weight:  disciplina.peso || 0, 
-                    value: disciplina.valor || 0, 
+                    weight:  disciplina.peso, 
+                    value: disciplina.valor, 
                 }));
+            
+                try {
+                    const result = knapsack(items, capacidadeMochila);
     
-            const result = knapsack(items, capacidadeMochila);
+                    //console.log('Disciplinas Recomendadas:', result.selectedItems);
     
-            //console.log('Disciplinas Recomendadas:', result.selectedItems);
-    
-            setResultDisciplinas(result.selectedItems);
-            setMostrarDisciplinasRecomendadas(true);
+                    setResultDisciplinas(result.selectedItems);
+                    setMostrarDisciplinasRecomendadas(true);
+                } catch (error) {
+                    console.error('Erro ao calcular recomendação:', error);
+                } finally {
+                    setLoading(false); 
+                }
         }
     };
 
@@ -255,26 +303,48 @@ function Home() {
             <div className='conteiner custom-container2'>
                 <button onClick={knapsackButtonClick} className='my-4 custom-button'> + Gerar Recomendação</button>
                 <div>
-                    {mostrarDisciplinasRecomendadas && (
+                {loading ? (
+                        <div className="text-center">
+                            <p>Carregando Recomendação...</p>
+                        </div>
+                    ) : mostrarDisciplinasRecomendadas ? (
                         <>
-                            <p className='h2 text-center my-4'>Disciplinas Recomendadas</p>
+                            <p className="h2 text-center my-4">Disciplinas Recomendadas</p>
                             {resultDisciplinas.map((disciplina, i) => (
                                 <DisciplinasRecomendadas key={i} title={disciplina.nome} />
                             ))}
                         </>
-                    )}
+                    ) : null}
                 </div>
                 <div>
                     <p className='h2 text-center my-4'>Disciplinas Ofertadas 2023/2</p>
-                    {Object.keys(nomesDisciplinas).map((periodo, index) => (
-                        <div key={index}>
-                            <p><b>{periodo === 'Complementar' ? 'Disciplinas Complementares' : `${periodo}º Semestre`}</b></p>
-                            
-                            {nomesDisciplinas[periodo].map((disciplina, i) => (
-                                <AccordionComponent key={i} title={disciplina.nome} />
-                            ))}
+                    {loadingOfertadas ? (
+                        <div className="text-center">
+                            <p>Carregando oferta de disciplinas...</p>
                         </div>
-                    ))}
+                    ) : (
+                        Object.keys(nomesDisciplinas).map((periodo, index) => (
+                            <div key={index}>
+                                <p>
+                                    <b>
+                                        {periodo === 'Complementar'
+                                            ? 'Disciplinas Complementares'
+                                            : `${periodo}º Semestre`}
+                                    </b>
+                                </p>
+
+                                {nomesDisciplinas[periodo].map((disciplina, i) => (
+                                    <AccordionComponent
+                                        key={i}
+                                        title={disciplina.nome}
+                                        codigo={disciplina.codigo}
+                                        periodo={disciplina.periodo}
+                                        peso={disciplina.peso}
+                                    />
+                                ))}
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
         </>

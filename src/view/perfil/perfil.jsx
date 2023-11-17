@@ -27,7 +27,7 @@ function Perfil() {
         // Valores atribuídos a cada resposta
         const values = {
             moradia: { Sim: 2, Nao: 0 },
-            curso_tecnico: { sim: 0, Nao: 1 },
+            curso_tecnico: { Sim: 0, Nao: 1 },
             vinculo_trabalho: { 0: 0, 20: 6, 30: 8, 40: 10, 44: 12 },
             saude_mental: { Bom: 0, Regular: 2, Ruim: 5 },
         };
