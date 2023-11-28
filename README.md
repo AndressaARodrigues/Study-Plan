@@ -57,7 +57,7 @@ Para utilizar o sistema de recomendação, siga os seguintes passos:
 
 1. Certifique-se de ter o Node.js instalado em sua máquina.
 
-2. Clone este repositório em sua máquina local usando o seguinte comando no terminal: `git clone https://github.com/SeuNome/seu-repositorio.git`
+2. Clone este repositório em sua máquina local usando o seguinte comando no terminal: `git clone https://github.com/AndressaARodrigues/Study-Plan`
 
 3. Acesse o diretório do projeto: `cd sistema-recomendacao`
 
