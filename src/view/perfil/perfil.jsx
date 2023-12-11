@@ -105,7 +105,7 @@ function Perfil() {
 
             <div className='container custom-container'>
                 {isEditing ? (
-                    <p className="h3 text-center my-4">Editar de Perfil</p>
+                    <p className="h3 text-center my-4">Editar Perfil</p>
                 ) : (
                     <p className="h3 text-center my-4">Perfil</p>
                 )}

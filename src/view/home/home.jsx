@@ -6,6 +6,7 @@ import Navbar from '../../components/navbar/mainNavigation';
 import AccordionComponent from '../../components/accordion/accordion';
 import DisciplinasRecomendadas from '../../components/disciplinasRecomendadas/disciplinasRecomendadas';
 import './home.css';
+import Loading from '../../assets/loading-thinking.gif'
 
 function Home() {
     const auth = getAuth(firebase);
@@ -17,8 +18,8 @@ function Home() {
     const [resultDisciplinas, setResultDisciplinas] = useState([]);
     const [mostrarDisciplinasRecomendadas, setMostrarDisciplinasRecomendadas] = useState(false);
 
-    const [loading, setLoading] = useState(false); // New state for loading
-    const [loadingOfertadas, setLoadingOfertadas] = useState(true); // New state for loading disciplinas ofertadas
+    const [loading, setLoading] = useState(false); 
+    const [loadingOfertadas, setLoadingOfertadas] = useState(true); 
 
     const semestreIdExemplo = 'twyH3UVeA28bvH82xBJ2';//'ZmG0tLrmaEswlMjhNNam';
        
@@ -238,7 +239,6 @@ function Home() {
     }, [user]);
 
     const knapsack = (items, capacidadeMochila) => {
-       // console.log('disciplinas sorteadas',items);
         const n = items.length;
         const dp = new Array(n + 1).fill(0).map(() => new Array(capacidadeMochila + 1).fill(0));
     
@@ -320,7 +320,12 @@ function Home() {
                     <p className='h2 text-center my-4'>Disciplinas Ofertadas 2023/2</p>
                     {loadingOfertadas ? (
                         <div className="text-center">
-                            <p>Carregando oferta de disciplinas...</p>
+                            <p>Carregando oferta de disciplinas</p>
+                            <img src={Loading} alt="Carregando..."  className="loading" />
+                            
+                            {/*<div className="loading-spinner-container">
+                                <div className="loading-spinner"></div>
+                            </div>*/}
                         </div>
                     ) : (
                         Object.keys(nomesDisciplinas).map((periodo, index) => (

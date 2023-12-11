@@ -24,13 +24,14 @@ function MainNavigation() {
                         <Nav>
                             {useSelector(state => state.user.userLogged) > 0 ? (
                                 <>
-                                    <Nav.Link as={Link} to="/">ínicio</Nav.Link>
-                                    <Nav.Link as={Link} to="/editarPerfil">Perfil</Nav.Link>
-                                    <Nav.Link onClick={() => dispatch({ type: 'LOG_OUT' }) } as={Link} to="/login">Sair</Nav.Link>
+                                    <Nav.Link className="NavLink" as={Link} to="/">Início</Nav.Link>
+                                    <Nav.Link className="NavLink" as={Link} to="/editarPerfil">Perfil</Nav.Link>
+                                    <Nav.Link className="NavLink" onClick={() => dispatch({ type: 'LOG_OUT' }) } as={Link} to="/login">Sair</Nav.Link>
+
                                 </>
                             ) : (
                                 <>
-                                    <Nav.Link as={Link} to="/login">Logar</Nav.Link>
+                                    <Nav.Link className="NavLink" as={Link} to="/login">Logar</Nav.Link>
                                 </>
                             )}
                         </Nav>
