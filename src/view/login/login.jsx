@@ -44,7 +44,7 @@ function Login() {
                 
                 {/*console.log('Valor de userLogged:', userLogged)*/}
 
-                {userLogged > 0 ? <Navigate to='/' /> : <Navigate to='/login' />}
+                {userLogged > 0 ? <Navigate to='/inicio' /> : <Navigate to='/' />}
                
                 <div className="row">
                     <div className="col-md-6 d-flex flex-column justify-content-between">

@@ -1,18 +1,8 @@
-/*.logo{
-    width: 150px;
-    height: 60px;
-
-}*/
-
-/* mainNavigation.css */
-
-/* Estilo para NavLinks */
 .NavLink:hover {
-    color: blue; /* Cor azul ao passar o mouse */
+    color: blue; 
   }
   
  
 .NavbarBrand:hover {
-    color: blue; /* Cor azul ao passar o mouse */
+    color: blue; 
 }
-  

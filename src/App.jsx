@@ -6,6 +6,7 @@ import { PersistGate} from 'redux-persist/integration/react';
 import Login from './view/login/login';
 import Home from './view/home/home';
 import EditarPerfil from './view/perfil/perfil';
+import ErrorPage from './view/errorPage/errorPage';
 
 function App() {
   return (
@@ -13,9 +14,12 @@ function App() {
     <PersistGate loading={null} persistor={persistor}>
       <Router>
         <Routes>
-          <Route exact path='/' element={<Home />} />
-          <Route exact path='/login' element={<Login />} />
+          <Route exact path='/' element={<Login />} />
+          <Route exact path='/inicio' element={<Home />} />
           <Route path='/editarPerfil' element={<EditarPerfil/>} />
+
+          {/* Rota coringa para lidar com rotas inexistentes */}
+          <Route path='*' element={<ErrorPage/>} />
         </Routes>
       </Router>
       </PersistGate>

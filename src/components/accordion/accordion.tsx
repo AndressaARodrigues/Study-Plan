@@ -26,12 +26,12 @@ function AccordionComponent({ title, codigo, periodo, peso }) {
       {isOpen && (
         <div className='accordion-info'>
           <p>{codigo} - {title}</p>
-          <p>
-              <p dangerouslySetInnerHTML={{ __html: periodo === 'Complementar' ?
-                  'Disciplina Complementar<br>(Cadeira não Obrigatória)' :
-                  `${periodo}º Semestre<br>(Cadeira Obrigatória)` }}
-              />
-          </p>
+          
+          <p dangerouslySetInnerHTML={{ __html: periodo === 'Complementar' ?
+                'Disciplina Complementar<br>(Cadeira não Obrigatória)' :
+                `${periodo}º Semestre<br>(Cadeira Obrigatória)` }}
+          />
+          
           <p>
             {peso} créditos - {peso === 4 ? '60h' : peso === 2 ? '30h' : peso === 3 ? '45h' : ''}
           </p>
