@@ -102,8 +102,6 @@ function Perfil() {
     const handleEdit = () => {
         setIsEditing(true);
     }
-     console.log('Dados do usuário disponíveis:', userData);
-
     
     return (
         <>

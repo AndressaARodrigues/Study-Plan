@@ -5,30 +5,57 @@
     flex-direction: column; 
 }
 
+.disciplinas-recomendadas {
+    width: 600px;
+    padding: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
 
+}
+  
+.title-recomendada {
+    width: 100%; 
+    /*text-align: center;*/
+}
+  
+.remover-btn {
+    background: transparent;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+}
+
+.remover-btn:hover{
+    color: #ff4d4d;
+}
+  
 @media screen and (max-width: 700px) {
     .accordion-container {
-      width: 500px;
+        width: 500px;
     }
 }
 
 @media screen and (max-width: 500px) {
-    .accordion-container, .title-recomendada {
-      width: 300px;
+    .accordion-container {
+        width: 300px;
     }
-}
-  
 
-.title-recomendada {
-    width: 500px;
-    margin-bottom: 20px;
-    display: flex; 
-    flex-direction: column; 
-    cursor: pointer;
-    padding: 10px 20px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid #d9d9d9;
+    .disciplinas-recomendadas {
+        width: 300px;
+        align-items: center;
+    }
+    
+    .title-recomendada {
+        width: auto; 
+        margin-bottom: 0;
+    }
+    
+    .remover-btn {
+        font-size: 16px;
+    }
 }

@@ -21,6 +21,11 @@ function Home() {
     const [loading, setLoading] = useState(false); 
     const [loadingOfertadas, setLoadingOfertadas] = useState(true); 
 
+    const [totalCreditos, setTotalCreditos] = useState(0);
+    const [msgType, setMsgType] = useState();
+    //const [showWarning, setShowWarning] = useState(false);
+
+
     const semestreIdExemplo = 'twyH3UVeA28bvH82xBJ2';//'ZmG0tLrmaEswlMjhNNam';
        
     async function obterNomesDisciplinas(referencias) {
@@ -289,6 +294,16 @@ function Home() {
     
                     setResultDisciplinas(result.selectedItems);
                     setMostrarDisciplinasRecomendadas(true);
+                
+                    const total = result.selectedItems.reduce((acc, disciplina) => {
+                        // Verificar se o campo "peso" é um número válido
+                        const peso = disciplina.weight;
+                        return acc + peso;
+                    }, 0);
+
+                    setTotalCreditos(total);
+                
+
                 } catch (error) {
                     console.error('Erro ao calcular recomendação:', error);
                 } finally {
@@ -296,6 +311,53 @@ function Home() {
                 }
         }
     };
+    
+    
+    useEffect(() => {
+        // Limpar a mensagem após 3 segundos (3000 milissegundos)
+        const timer = setTimeout(() => {
+            setMsgType(null);
+        }, 3000);
+
+        // Limpar o timer se o componente for desmontado
+        return () => clearTimeout(timer);
+    }, [msgType]);
+
+
+
+    const removerDisciplina = (index) => {
+        const disciplinasAtualizadas = [...resultDisciplinas];
+        const disciplinaRemovida = disciplinasAtualizadas.splice(index, 1)[0];
+      
+        const totalAtual = totalCreditos - disciplinaRemovida.weight;
+      
+        if (totalAtual >= 12) {
+          setTotalCreditos(totalAtual);
+          setResultDisciplinas(disciplinasAtualizadas);
+          setMsgType('success');
+        } else {
+          // Se a remoção violar a regra dos 12 créditos, reverter a operação e definir a mensagem de erro
+          disciplinasAtualizadas.push(disciplinaRemovida);
+          setMsgType('error');
+        }
+      };
+
+
+      const adicionarDisciplina = (disciplina) => {
+        const totalAtual = totalCreditos + disciplina.peso;
+      
+       
+          setTotalCreditos(totalAtual);
+          setResultDisciplinas((prevDisciplinas) => [...prevDisciplinas, disciplina]);
+      
+          // Verificar se o total ultrapassou a recomendação inicial
+          if (totalAtual > capacidadeMochila) {
+            setMsgType('warning');
+          }else {
+            setMsgType('successA');
+          }
+      };
+      
 
     return (
         <>
@@ -308,10 +370,37 @@ function Home() {
                             <p>Carregando Recomendação...</p>
                         </div>
                     ) : mostrarDisciplinasRecomendadas ? (
-                        <>
+                        <>  
                             <p className="h2 text-center my-4">Disciplinas Recomendadas</p>
+                            <p>Total de Créditos: {totalCreditos}</p>
+                            <div className="msg-login text-black text-center my-5">
+                                {msgType === 'success' && (
+                                    <span className="alert alert-success rounded mt-2">
+                                        <strong>WoW!</strong> Disciplina removida com sucesso!
+                                    </span>
+                                )}
+                                {msgType === 'successA' && (
+                                    <span className="alert alert-success rounded mt-2">
+                                        <strong>WoW!</strong> Disciplina adicionada com sucesso!
+                                    </span>
+                                )}
+                                {msgType === 'warning' && (
+                                    <span className="alert alert-warning rounded mt-2">
+                                        <strong>Atenção:</strong> Você adicionou mais créditos! Isso não é recomendado para seu perfil.
+                                    </span>
+                                )}
+                                {msgType === 'error' && (
+                                    <span className="alert alert-danger rounded mt-2">
+                                        <strong>Ops!</strong> O limite minímo de créditos para cursar durante o semestre é de 12 créditos!
+                                    </span>
+                                )}
+                            </div>
                             {resultDisciplinas.map((disciplina, i) => (
-                                <DisciplinasRecomendadas key={i} title={disciplina.nome} />
+                            <DisciplinasRecomendadas
+                                key={i}
+                                title={disciplina.nome}
+                                onRemover={() => removerDisciplina(i)}
+                            />
                             ))}
                         </>
                     ) : null}
@@ -339,13 +428,15 @@ function Home() {
                                 </p>
 
                                 {nomesDisciplinas[periodo].map((disciplina, i) => (
-                                    <AccordionComponent
-                                        key={i}
-                                        title={disciplina.nome}
-                                        codigo={disciplina.codigo}
-                                        periodo={disciplina.periodo}
-                                        peso={disciplina.peso}
-                                    />
+                                    <div key={i}>
+                                        <AccordionComponent
+                                            title={disciplina.nome}
+                                            codigo={disciplina.codigo}
+                                            periodo={disciplina.periodo}
+                                            peso={disciplina.peso}
+                                            onAdicionar={() => adicionarDisciplina(disciplina)}
+                                        />
+                                    </div>
                                 ))}
                             </div>
                         ))

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './accordion.css';
 
-function AccordionComponent({ title, codigo, periodo, peso }) {
+function AccordionComponent({ title, codigo, periodo, peso, onAdicionar}) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleAccordion = () => {
@@ -18,10 +18,14 @@ function AccordionComponent({ title, codigo, periodo, peso }) {
             color: isOpen ? 'blue' : '',
         }}
         >
+        <button className='adicionar-btn' onClick={onAdicionar}>
+          <i className="bi-plus-circle"></i>
+        </button>
         {title}
         <i className={`fa ${isOpen ? 'bi bi-chevron-up' : 'bi bi-chevron-down'}`}
            style={{ color: `${isOpen ? 'blue' : ''}`} 
         } />
+
       </div>
       {isOpen && (
         <div className='accordion-info'>

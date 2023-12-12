@@ -15,7 +15,7 @@ function App() {
       <Router>
         <Routes>
           <Route exact path='/' element={<Login />} />
-          <Route exact path='/inicio' element={<Home />} />
+          <Route path='/inicio' element={<Home />} />
           <Route path='/editarPerfil' element={<EditarPerfil/>} />
 
           {/* Rota coringa para lidar com rotas inexistentes */}
