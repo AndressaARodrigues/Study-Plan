@@ -1,12 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-
-import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore'; 
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore'; 
 import { getAuth } from 'firebase/auth'; 
-
-import { updateProfile } from '../../store/dataAction';
 import firebase from '../../config/firebase';
-
 import Navbar from '../../components/navbar/mainNavigation';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -15,16 +10,23 @@ import './perfil.css';
 function Perfil() {
     const auth = getAuth(firebase);
     const user = auth.currentUser;
-
-    const dispatch = useDispatch();
-    const userDataFromRedux = useSelector(state => state.profile.data);  
-    const [userData, setUserData] = useState(userDataFromRedux);
-
+    const [userData, setUserData] = useState(() => {
+        // Tenta obter dados do localStorage, caso contrário, usa um objeto vazio
+        const storedData = localStorage.getItem('userData');
+        return storedData ? JSON.parse(storedData) : {
+            nome: '',
+            matricula: '',
+            email: '',
+            moradia: '',
+            curso_tecnico: '',
+            saude_mental: '',
+            vinculo_trabalho: '',
+        };
+    });
     const [isEditing, setIsEditing] = useState(false);
     const [feedback, setFeedback] = useState(null);
-
-    function calculateCapacityknapsack(userData){
-        // Valores atribuídos a cada resposta
+    
+    const calculateCapacityknapsack = (userData) => {
         const values = {
             moradia: { Sim: 2, Nao: 0 },
             curso_tecnico: { Sim: 0, Nao: 1 },
@@ -47,47 +49,50 @@ function Perfil() {
     }
 
     useEffect(() => {
-        if (user) {
-            const fetchUser = async () => {
-                const db = getFirestore();
-                const userDocRef = doc(db, 'usuarios', user.uid);
-                const userDoc = await getDoc(userDocRef);
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    dispatch(updateProfile(userData));
-                    setUserData(userData); 
+
+        const fetchUser = async () => {
+            if (user) {
+                try {
+                    const db = getFirestore();
+                    const userDocRef = doc(db, 'usuarios', user.uid);
+                    const userDoc = await getDoc(userDocRef);
+                    
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        setUserData(userData);
+
+                        // Salva os dados no localStorage
+                        localStorage.setItem('userData', JSON.stringify(userData));
+                
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar os dados do usuário:', error);
                 }
-            };
-            fetchUser();
-        } 
-    }, [dispatch, user]);
+            }
+        };
+  
+        fetchUser();
+    }, [user]);
+
 
     const save = async () => {
         try {
-            if (user) {
-                // Calcular a capacidade da mochila
+            if (user && userData) {
                 const newCapacity = calculateCapacityknapsack(userData);
-
-                // Salvar os dados no Firebase
+                
                 const db = getFirestore();
                 const userDocRef = doc(db, 'usuarios', user.uid);
                 await setDoc(userDocRef, { ...userData, capacidade_mochila: newCapacity });
                 setIsEditing(false);
-                
-                console.log(newCapacity);
-                // Atualizar os dados no Redux Store
-                dispatch(updateProfile({ ...userData, capacidade_mochila: newCapacity }));
-                
-                // Define a mensagem de feedback
+
                 setFeedback('Informações salvas com sucesso.');
 
-                // Limpa a mensagem de feedback após 3 segundos (3000 milissegundos)
+                // Atualiza os dados no localStorage após salvar
+                localStorage.setItem('userData', JSON.stringify({ ...userData, capacidade_mochila: newCapacity }));
+
                 setTimeout(() => {
                     setFeedback(null);
                 }, 3000);
-            
-            } else {
-                console.error('Usuário não autenticado.');
             }
         } catch (error) {
             console.error('Erro ao salvar os dados:', error);
@@ -97,12 +102,12 @@ function Perfil() {
     const handleEdit = () => {
         setIsEditing(true);
     }
+     console.log('Dados do usuário disponíveis:', userData);
 
+    
     return (
         <>
             <Navbar />
-            {/*console.log('Valor de userData:', userDataFromRedux)*/}
-
             <div className='container custom-container'>
                 {isEditing ? (
                     <p className="h3 text-center my-4">Editar Perfil</p>
@@ -126,6 +131,7 @@ function Perfil() {
                                 value={userData.nome}
                                 onChange={(e) => setUserData({ ...userData, nome: e.target.value })}
                                 disabled={!isEditing}
+
                            />
                         </div>
 
@@ -211,22 +217,23 @@ function Perfil() {
                             </Form.Select>
                         </div>
 
+
                         <div className='text-center'>
                             {isEditing ? (
                                 <>
                                     <Button onClick={save} type="button" variant="primary" className="mx-2 my-2">
-                                    Salvar
+                                        Salvar
                                     </Button>
                                     <Button onClick={() => setIsEditing(false)} type="button" variant="secondary" className="mx-2 my-2">
-                                    Cancelar
+                                        Cancelar
                                     </Button>
                                 </>
                             ) : (
                                 <Button onClick={handleEdit} type="button" variant="secondary">
-                                Editar
+                                    Editar
                                 </Button>
                             )}
-                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
