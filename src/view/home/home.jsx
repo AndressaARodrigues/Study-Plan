@@ -24,7 +24,8 @@ function Home() {
     const [totalCreditos, setTotalCreditos] = useState(0);
     const [msgType, setMsgType] = useState();
     //const [showWarning, setShowWarning] = useState(false);
-
+    const [disciplinasAdicionadas, setDisciplinasAdicionadas] = useState([]);
+    const [mostrarBotaoAdicionar, setMostrarBotaoAdicionar] = useState(false);
 
     const semestreIdExemplo = 'twyH3UVeA28bvH82xBJ2';//'ZmG0tLrmaEswlMjhNNam';
        
@@ -302,7 +303,7 @@ function Home() {
                     }, 0);
 
                     setTotalCreditos(total);
-                
+                    setMostrarBotaoAdicionar(true);
 
                 } catch (error) {
                     console.error('Erro ao calcular recomendação:', error);
@@ -343,20 +344,29 @@ function Home() {
       };
 
 
+
       const adicionarDisciplina = (disciplina) => {
         const totalAtual = totalCreditos + disciplina.peso;
       
-       
-          setTotalCreditos(totalAtual);
-          setResultDisciplinas((prevDisciplinas) => [...prevDisciplinas, disciplina]);
-      
-          // Verificar se o total ultrapassou a recomendação inicial
-          if (totalAtual > capacidadeMochila) {
-            setMsgType('warning');
-          }else {
-            setMsgType('successA');
-          }
+        if (!disciplinasAdicionadas.includes(disciplina.id)) {
+            setTotalCreditos(totalAtual);
+            setResultDisciplinas((prevDisciplinas) => [...prevDisciplinas, disciplina]);
+            
+        
+            // Adicionar a disciplina ao estado de disciplinas adicionadas
+            setDisciplinasAdicionadas((prevDisciplinas) => [...prevDisciplinas, disciplina.id]);
+        
+            // Verificar se o total ultrapassou a recomendação inicial
+            if (totalAtual > capacidadeMochila) {
+              setMsgType('warning');
+            } else {
+              setMsgType('successA');
+            }
+        } else {
+          setMsgType('errorA');
+        }
       };
+      
       
 
     return (
@@ -394,6 +404,12 @@ function Home() {
                                         <strong>Ops!</strong> O limite minímo de créditos para cursar durante o semestre é de 12 créditos!
                                     </span>
                                 )}
+                                {msgType === 'errorA' && (
+                                    <span className="alert alert-danger rounded mt-2">
+                                        <strong>Ops!</strong> Esta disciplina já foi adicionada.
+                                    </span>
+                                )}
+                                
                             </div>
                             {resultDisciplinas.map((disciplina, i) => (
                             <DisciplinasRecomendadas
@@ -435,6 +451,7 @@ function Home() {
                                             periodo={disciplina.periodo}
                                             peso={disciplina.peso}
                                             onAdicionar={() => adicionarDisciplina(disciplina)}
+                                            mostrarBotaoAdicionar={mostrarBotaoAdicionar}
                                         />
                                     </div>
                                 ))}
