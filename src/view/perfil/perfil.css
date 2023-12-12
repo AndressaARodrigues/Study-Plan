@@ -2,3 +2,15 @@
     width: 600px; 
     padding-bottom: 50px;
 }
+
+@media screen and (max-width: 578px) {
+    .custom-container {
+        width: 450px;
+    }
+}
+
+@media screen and (max-width: 450px) {
+    .custom-container {
+        width: 350px;
+    }
+}
